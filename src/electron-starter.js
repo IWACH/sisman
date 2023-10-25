@@ -6,64 +6,46 @@ const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
 const url = require('url');
-const child_process = require('child_process');
+//const child_process = require('child_process');
+const { exec } = require('child_process');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-function openExcel(code) {
-    switch (code) {
-        case 1:
-            child_process.exec("excel " + __dirname + '/excels/Book1.xlsx');
-            break;
-        case 2:
-            child_process.exec("excel " + __dirname + '/excels/Book2.xlsx');
-            break;
-        case 3:
-            child_process.exec("excel " + __dirname + '/excels/Book3.xlsx');
-            break;
-        case 4:
-            child_process.exec("excel " + __dirname + '/excels/Book4.xlsx');
-            break;
-        case 5:
-            child_process.exec("excel " + __dirname + '/excels/Book5.xlsx');
-            break;
-        case 6:
-            child_process.exec("excel " + __dirname + '/excels/Book6.xlsx');
-            break;
-        default:
-    }
+function openExcel(name) {
+  const filePath = path.join(__dirname, 'excels', `Book${name}.xlsx`);
+  exec(`open -a Microsoft\\ Excel ${filePath}`);
 }
 
 electron.ipcMain.on('open-excel', (event, arg) => {
-    openExcel(arg.code);
+  openExcel(arg.name);
 });
 
 function createWindow() {
-    // Create the browser window.
-    mainWindow = new BrowserWindow({
-        width: 1000,
-        height: 600,
-        webPreferences: {
-            nodeIntegration: false,
-            preload: __dirname + '/preload.js'
-        }
-    });
+  // Create the browser window.
+  mainWindow = new BrowserWindow({
+    width: 1000,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: false,
+      preload: __dirname + '/preload.js',
+    },
+  });
 
-    // and load the index.html of the app.
-    mainWindow.loadURL('http://localhost:3000');
+  // and load the index.html of the app.
+  mainWindow.loadURL('http://localhost:3000');
 
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+  // Open the DevTools.
+  // mainWindow.webContents.openDevTools();
 
-    // Emitted when the window is closed.
-    mainWindow.on('closed', function () {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
-        mainWindow = null
-    });
+  // Emitted when the window is closed.
+  mainWindow.on('closed', function () {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    mainWindow = null;
+  });
 }
 
 // This method will be called when Electron has finished
@@ -73,19 +55,19 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-        app.quit()
-    }
+  // On OS X it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 app.on('activate', function () {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (mainWindow === null) {
-        createWindow()
-    }
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (mainWindow === null) {
+    createWindow();
+  }
 });
 
 // In this file you can include the rest of your app's specific main process
